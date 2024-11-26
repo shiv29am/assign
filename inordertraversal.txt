@@ -1,0 +1,133 @@
+5. Inorder                 Filename: inorderTraversal
+
+package prac;
+import java.util.Scanner;
+
+class Node {
+    int data;
+    Node left, right;
+    boolean isLeftThread, isRightThread;
+
+    public Node(int data) {
+        this.data = data;
+        this.left = this.right = null;
+        this.isLeftThread = this.isRightThread = false;
+    }
+}
+
+class ThreadedBinaryTree {
+    private Node root;
+
+    // Insert a new node into the tree
+    public void insert(int data) {
+        root = insertNode(root, data, null);
+    }
+
+    private Node insertNode(Node current, int data, Node parent) {
+        if (current == null) {
+            Node newNode = new Node(data);
+            if (parent != null) {
+                if (data < parent.data) {
+                    newNode.left = parent.left;
+                    newNode.right = parent;
+                    newNode.isLeftThread = true;
+                    newNode.isRightThread = true;
+                } else {
+                    newNode.left = parent;
+                    newNode.right = parent.right;
+                    newNode.isLeftThread = true;
+                    newNode.isRightThread = true;
+                }
+            }
+            return newNode;
+        }
+        if (data < current.data) {
+            if (current.isLeftThread) {
+                current.left = insertNode(null, data, current);
+                current.isLeftThread = false;
+            } else {
+                current.left = insertNode(current.left, data, current);
+            }
+        } else if (data > current.data) {
+            if (current.isRightThread) {
+                current.right = insertNode(null, data, current);
+                current.isRightThread = false;
+            } else {
+                current.right = insertNode(current.right, data, current);
+            }
+        }
+        return current;
+    }
+
+    // Perform inorder traversal of the tree
+    public void inorderTraversal() {
+        if (root == null) {
+            System.out.println("Tree is empty.");
+            return;
+        }
+        Node current = leftMost(root);
+        while (current != null) {
+            System.out.print(current.data + " ");
+            if (current.isRightThread) {
+                current = current.right;
+            } else {
+                current = leftMost(current.right);
+            }
+        }
+        System.out.println();
+    }
+
+    // Find the leftmost node
+    private Node leftMost(Node node) {
+        if (node == null) return null;
+        while (!node.isLeftThread) {
+            node = node.left;
+        }
+        return node;
+    }
+}
+
+public class inorderTraversal {
+    public static void main(String[] args) {
+        ThreadedBinaryTree tbt = new ThreadedBinaryTree();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Threaded Binary Tree Operations ---");
+            System.out.println("1. Insert");
+            System.out.println("2. Display Inorder Traversal");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter a number to insert: ");
+                    int data = scanner.nextInt();
+                    tbt.insert(data);
+                    System.out.println("Inserted " + data + " into the tree.");
+                    break;
+                case 2:
+                    System.out.println("Inorder Traversal:");
+                    tbt.inorderTraversal();
+                    break;
+                case 3:
+                    System.out.println("Exiting program. Goodbye!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        }
+    }
+}
+
+
+INORDER TRAVERSAL:
+Traverse the left subtree.
+Visit the root node.
+Traverse the right subtree.
+Sample input: 10 5 15
+
+
+

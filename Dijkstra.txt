@@ -1,0 +1,112 @@
+8. Dijkstra    Name: DijkstraAlgorithm 
+
+package prac;
+
+import java.util.*;
+
+//Main class for Dijkstra's Algorithm
+public class DijkstraAlgorithm {
+
+    // Nested static class to represent a Node in the priority queue
+    static class Node implements Comparable<Node> {
+        int vertex, weight;
+
+        public Node(int vertex, int weight) {
+            this.vertex = vertex;
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return this.weight - other.weight; // Min-heap based on weight
+        }
+    }
+
+    // Function to find the shortest paths using Dijkstra's algorithm
+    public static void dijkstra(int vertices, List<List<Node>> graph, int source) {
+        int[] distances = new int[vertices]; // Stores shortest distances from source
+        Arrays.fill(distances, Integer.MAX_VALUE); // Initialize all distances to infinity
+        distances[source] = 0; // Distance to the source itself is 0
+
+        PriorityQueue<Node> pq = new PriorityQueue<>(); // Priority queue (min-heap)
+        pq.add(new Node(source, 0));
+
+        boolean[] visited = new boolean[vertices]; // Tracks visited nodes
+
+        while (!pq.isEmpty()) {
+            Node currentNode = pq.poll(); // Get the node with the minimum distance
+            int currentVertex = currentNode.vertex;
+
+            if (visited[currentVertex]) continue; // Skip if already visited
+            visited[currentVertex] = true;
+
+            // Traverse all neighbors of the current node
+            for (Node neighbor : graph.get(currentVertex)) {
+                int neighborVertex = neighbor.vertex;
+                int edgeWeight = neighbor.weight;
+
+                // Relaxation: check if a shorter path is found
+                if (!visited[neighborVertex] && distances[currentVertex] + edgeWeight < distances[neighborVertex]) {
+                    distances[neighborVertex] = distances[currentVertex] + edgeWeight;
+                    pq.add(new Node(neighborVertex, distances[neighborVertex])); // Add updated node to pq
+                }
+            }
+        }
+
+        // Print the shortest distances from the source
+        System.out.println("Shortest distances from source " + source + ":");
+        for (int i = 0; i < vertices; i++) {
+            System.out.println("To " + i + " : " + (distances[i] == Integer.MAX_VALUE ? "Unreachable" : distances[i]));
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the number of locations (vertices):");
+        int vertices = scanner.nextInt();
+
+        System.out.println("Enter the number of roads (edges):");
+        int edges = scanner.nextInt();
+
+        List<List<Node>> graph = new ArrayList<>(); // Adjacency list to represent the graph
+        for (int i = 0; i < vertices; i++) {
+            graph.add(new ArrayList<>());
+        }
+
+        System.out.println("Enter the roads (source, destination, distance):");
+        for (int i = 0; i < edges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            int distance = scanner.nextInt();
+
+            // Add edges to the graph (undirected graph)
+            graph.get(source).add(new Node(destination, distance));
+            graph.get(destination).add(new Node(source, distance));
+        }
+
+        System.out.println("Enter the source location:");
+        int source = scanner.nextInt();
+
+        // Find the shortest paths using Dijkstra's algorithm
+        dijkstra(vertices, graph, source);
+
+        scanner.close();
+    }
+}
+
+SAMPLE INPUT:
+Enter the number of locations (vertices):
+5
+Enter the number of roads (edges):
+6
+Enter the roads (source, destination, distance):
+0 1 10
+0 2 5
+1 2 2
+1 3 1
+2 3 9
+3 4 4
+Enter the source location:
+0
+
